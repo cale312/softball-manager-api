@@ -9,7 +9,7 @@ let TeamsSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
-    manager: {
+    managerName: {
         type: String,
         required: true
     },

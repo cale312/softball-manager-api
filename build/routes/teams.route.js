@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const teams_1 = require("../models/teams");
+const managers_1 = require("../models/managers");
 const players_1 = require("../models/players");
 /* GET Managers listing. */
 class TeamsRouter {
@@ -28,15 +29,19 @@ class TeamsRouter {
     }
     createTeam(req, res, next) {
         const teamName = req.body.teamName;
-        const manager = req.body.manager;
+        const managerName = req.body.managerName;
         const coach = req.body.coach;
         const rank = req.body.rank;
-        if (!teamName || !coach || !rank || !manager) {
+        if (!teamName || !coach || !rank || !managerName) {
             res.status(422).json({ message: 'All Fields Required Must Be Filled.' });
         }
+        let manager = new managers_1.default({
+            fullName: managerName,
+            ownedTeam: teamName
+        });
         let team = new teams_1.default({
             teamName: teamName,
-            manager: manager,
+            managerName: managerName,
             coach: coach,
             rank: rank,
             teamPlayers: []
@@ -45,6 +50,7 @@ class TeamsRouter {
             teamName: teamName
         }).then((result) => {
             if (!result) {
+                manager.save();
                 team.save()
                     .then((team) => {
                     let code = res.statusCode;

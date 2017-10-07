@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import Team from '../models/teams';
+import Manager from '../models/managers';
 import Player from '../models/players';
 
 /* GET Managers listing. */
@@ -33,17 +34,22 @@ export class TeamsRouter {
   public createTeam(req: Request, res: Response, next: NextFunction) {
 
     const teamName: string = req.body.teamName;
-    const manager: string = req.body.manager;
+    const managerName: string = req.body.managerName;
     const coach: string = req.body.coach;
     const rank: number = req.body.rank;
 
-    if (!teamName || !coach || !rank || !manager) {
+    if (!teamName || !coach || !rank || !managerName) {
       res.status(422).json({ message: 'All Fields Required Must Be Filled.' });
     }
 
+    let manager = new Manager({
+      fullName: managerName,
+      ownedTeam: teamName
+    });
+
     let team = new Team({
       teamName: teamName,
-      manager: manager,
+      managerName: managerName,
       coach: coach,
       rank: rank,
       teamPlayers: []
@@ -53,6 +59,7 @@ export class TeamsRouter {
       teamName: teamName
     }).then( (result: any) => {
       if (!result) {
+        manager.save();
         team.save()
           .then((team: any) => {
             let code = res.statusCode;
