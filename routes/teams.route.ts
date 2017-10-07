@@ -69,8 +69,9 @@ export class TeamsRouter {
 
   public updateTeam(req: Request, res: Response, next: NextFunction) {
 
-    const teamName: string = req.body.teamName;
     const coach: string = req.body.coach;
+    const teamName: string = req.body.teamName;
+    const teamPlayers: any = req.body.teamPlayers;
 
     if (!teamName) {
       res.status(422).json({ message: 'Fill in all required fields'});
@@ -80,9 +81,10 @@ export class TeamsRouter {
       teamName: teamName
     }).then( (result: any) => {
       result.update({
-        coach: coach
+        coach: coach,
+        teamPlayers: teamPlayers
       }).then( (result: any) => {
-        const code = res.statusCode;
+        let code = res.statusCode;
         res.json({
           code,
           result
@@ -100,14 +102,14 @@ export class TeamsRouter {
 
   public deleteTeam(req: Request, res: Response, next: NextFunction) {
 
-    const _id: string = req.params._id;
+    const teamName: string = req.body.teamName;
 
-    if (!_id) {
+    if (!teamName) {
       res.status(422).json({ message: 'Fill in all required fields' })
     }
 
     Teams.remove({
-      _id: _id
+      teamName: teamName
     }).then( (result: any) => {
       let code = res.statusCode;
       res.json({

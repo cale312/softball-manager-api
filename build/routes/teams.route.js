@@ -58,8 +58,9 @@ class TeamsRouter {
         });
     }
     updateTeam(req, res, next) {
-        const teamName = req.body.teamName;
         const coach = req.body.coach;
+        const teamName = req.body.teamName;
+        const teamPlayers = req.body.teamPlayers;
         if (!teamName) {
             res.status(422).json({ message: 'Fill in all required fields' });
         }
@@ -67,9 +68,10 @@ class TeamsRouter {
             teamName: teamName
         }).then((result) => {
             result.update({
-                coach: coach
+                coach: coach,
+                teamPlayers: teamPlayers
             }).then((result) => {
-                const code = res.statusCode;
+                let code = res.statusCode;
                 res.json({
                     code,
                     result
@@ -84,12 +86,12 @@ class TeamsRouter {
         });
     }
     deleteTeam(req, res, next) {
-        const _id = req.params._id;
-        if (!_id) {
+        const teamName = req.body.teamName;
+        if (!teamName) {
             res.status(422).json({ message: 'Fill in all required fields' });
         }
         teams_1.default.remove({
-            _id: _id
+            teamName: teamName
         }).then((result) => {
             let code = res.statusCode;
             res.json({
