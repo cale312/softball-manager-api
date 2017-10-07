@@ -9,6 +9,10 @@ let TeamsSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
+    mananger: {
+        type: String,
+        required: true
+    },
     teamName: {
         type: String,
         required: true

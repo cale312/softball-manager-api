@@ -15,19 +15,15 @@ export class TeamsRouter {
     Teams.find()
       .then((teams: any) => {
         let code = res.statusCode;
-        let msg = res.statusMessage;
         res.json({
           code,
-          msg,
           teams
         });
       })
       .catch((error: any) => {
         let code = res.statusCode;
-        let msg = res.statusMessage;
         res.json({
           code,
-          msg,
           error
         });
       })
@@ -36,16 +32,18 @@ export class TeamsRouter {
   public createTeam(req: Request, res: Response, next: NextFunction) {
 
     const teamName: string = req.body.teamName;
+    const manager: string = req.body.manager;
     const coach: string = req.body.coach;
     const rank: number = req.body.rank;
     const teamPlayers: any = req.body.teamPlayers;
 
-    if (!teamName || !coach || !rank) {
+    if (!teamName || !coach || !rank || !manager) {
       res.status(422).json({ message: 'All Fields Required.' });
     }
 
     const team = new Teams({
       teamName: teamName,
+      manager: manager,
       coach: coach,
       rank: rank,
       teamPlayers
@@ -54,28 +52,83 @@ export class TeamsRouter {
     team.save()
       .then( (team: any) => {
         let code = res.statusCode;
-        let msg = res.statusMessage;
         res.json({
             code,
-            msg,
             team
         });
       })
       .catch( (err: any) => {
         let code = res.statusCode;
-        let msg = res.statusMessage;
         res.json({
           code,
-          msg,
           err
         });
+      });
+
+  }
+
+  public updateTeam(req: Request, res: Response, next: NextFunction) {
+
+    const teamName: string = req.body.teamName;
+    const coach: string = req.body.coach;
+
+    if (!teamName) {
+      res.status(422).json({ message: 'Fill in all required fields'});
+    }
+
+    Teams.findOne({
+      teamName: teamName
+    }).then( (result: any) => {
+      result.update({
+        coach: coach
+      }).then( (result: any) => {
+        const code = res.statusCode;
+        res.json({
+          code,
+          result
+        });
+      });
+    }).catch( (err: any) => {
+      const code = res.statusCode;
+      res.json({
+        code,
+        err
+      });
+    });
+
+  }
+
+  public deleteTeam(req: Request, res: Response, next: NextFunction) {
+
+    const _id: string = req.params._id;
+
+    if (!_id) {
+      res.status(422).json({ message: 'Fill in all required fields' })
+    }
+
+    Teams.remove({
+      _id: _id
+    }).then( (result: any) => {
+      let code = res.statusCode;
+      res.json({
+        code,
+        result
+      });
+    }).catch( (err: any) => {
+      let code = res.statusCode;
+      res.json({
+        code,
+        err
       })
+    });
 
   }
 
   routes() {
     this.router.get('/', this.getAllTeams);
     this.router.post('/newteam', this.createTeam);
+    this.router.post('/deleteteam/:_id', this.deleteTeam);
+    this.router.post('/updateteam', this.updateTeam);
   }
 
 }
