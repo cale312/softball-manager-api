@@ -69,7 +69,7 @@ class TeamsRouter {
         }).then((result) => {
             result.update({
                 coach: coach,
-                teamPlayers: teamPlayers
+                teamPlayers: teamPlayers || []
             }).then((result) => {
                 let code = res.statusCode;
                 res.json({

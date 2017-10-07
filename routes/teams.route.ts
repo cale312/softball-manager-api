@@ -82,7 +82,7 @@ export class TeamsRouter {
     }).then( (result: any) => {
       result.update({
         coach: coach,
-        teamPlayers: teamPlayers
+        teamPlayers: teamPlayers || []
       }).then( (result: any) => {
         let code = res.statusCode;
         res.json({
