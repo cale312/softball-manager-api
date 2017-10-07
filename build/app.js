@@ -8,7 +8,7 @@ const logger = require("morgan");
 const cors = require("cors");
 // custom modules
 const teams_route_1 = require("./routes/teams.route");
-const managers_route_1 = require("./routes/managers.route");
+require('mongoose').Promise = global.Promise;
 // Server class
 class Server {
     constructor() {
@@ -47,8 +47,7 @@ class Server {
         let router;
         router = express.Router();
         this.app.use('/', router);
-        this.app.use('/api/v1/teams', teams_route_1.TeamsRouter);
-        this.app.use('/api/v1/managers', managers_route_1.ManagersRoute);
+        this.app.use('/api/v1/teams', teams_route_1.default);
     }
 }
 // export
