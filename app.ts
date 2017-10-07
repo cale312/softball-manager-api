@@ -1,5 +1,6 @@
 import * as express from 'express';
 import * as mongoose from 'mongoose';
+import * as Promise from 'mongoose';
 import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
 import * as logger from 'morgan';
@@ -8,6 +9,7 @@ import * as path from 'path';
 
 // custom modules
 import TeamsRouter from './routes/teams.route';
+require('mongoose').Promise = global.Promise
 
 // Server class
 class Server {
@@ -23,6 +25,7 @@ class Server {
 
     // application config
     public config() {
+
 
         const MONGO_URI: string = 'mongodb://localhost/softball-manager' || process.env.MONGODB_URI;
         mongoose.connect(MONGO_URI, {
