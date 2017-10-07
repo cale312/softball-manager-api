@@ -8,7 +8,7 @@ let TeamsSchema: Schema = new Schema({
         type: String,
         required: true
     },
-    mananger: {
+    manager: {
         type: String,
         required: true
     },

@@ -41,29 +41,43 @@ export class TeamsRouter {
       res.status(422).json({ message: 'All Fields Required.' });
     }
 
-    const team = new Teams({
-      teamName: teamName,
-      manager: manager,
-      coach: coach,
-      rank: rank,
-      teamPlayers
-    });
-
-    team.save()
-      .then( (team: any) => {
-        let code = res.statusCode;
-        res.json({
-            code,
-            team
+    Teams.findOne({
+      teamName: teamName
+    }).then( (result: any) => {
+      if (!result) {
+        let team = new Teams({
+          teamName: teamName,
+          manager: manager,
+          coach: coach,
+          rank: rank,
+          teamPlayers
         });
-      })
-      .catch( (err: any) => {
+
+        team.save()
+          .then((team: any) => {
+            let code = res.statusCode;
+            res.json({
+              code,
+              team
+            });
+          })
+          .catch((err: any) => {
+            let code = res.statusCode;
+            res.json({
+              code,
+              err
+            });
+          });
+      } else {
         let code = res.statusCode;
+        let msg = 'Team Name already exist';
         res.json({
           code,
-          err
+          msg,
+          result
         });
-      });
+      }
+    });
 
   }
 
@@ -129,7 +143,7 @@ export class TeamsRouter {
   routes() {
     this.router.get('/', this.getAllTeams);
     this.router.post('/newteam', this.createTeam);
-    this.router.post('/deleteteam/:_id', this.deleteTeam);
+    this.router.post('/deleteteam', this.deleteTeam);
     this.router.post('/updateteam', this.updateTeam);
   }
 

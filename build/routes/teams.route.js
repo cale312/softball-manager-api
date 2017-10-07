@@ -34,27 +34,42 @@ class TeamsRouter {
         if (!teamName || !coach || !rank || !manager) {
             res.status(422).json({ message: 'All Fields Required.' });
         }
-        const team = new teams_1.default({
-            teamName: teamName,
-            manager: manager,
-            coach: coach,
-            rank: rank,
-            teamPlayers
-        });
-        team.save()
-            .then((team) => {
-            let code = res.statusCode;
-            res.json({
-                code,
-                team
-            });
-        })
-            .catch((err) => {
-            let code = res.statusCode;
-            res.json({
-                code,
-                err
-            });
+        teams_1.default.findOne({
+            teamName: teamName
+        }).then((result) => {
+            if (!result) {
+                let team = new teams_1.default({
+                    teamName: teamName,
+                    manager: manager,
+                    coach: coach,
+                    rank: rank,
+                    teamPlayers
+                });
+                team.save()
+                    .then((team) => {
+                    let code = res.statusCode;
+                    res.json({
+                        code,
+                        team
+                    });
+                })
+                    .catch((err) => {
+                    let code = res.statusCode;
+                    res.json({
+                        code,
+                        err
+                    });
+                });
+            }
+            else {
+                let code = res.statusCode;
+                let msg = 'Team Name already exist';
+                res.json({
+                    code,
+                    msg,
+                    result
+                });
+            }
         });
     }
     updateTeam(req, res, next) {
@@ -109,7 +124,7 @@ class TeamsRouter {
     routes() {
         this.router.get('/', this.getAllTeams);
         this.router.post('/newteam', this.createTeam);
-        this.router.post('/deleteteam/:_id', this.deleteTeam);
+        this.router.post('/deleteteam', this.deleteTeam);
         this.router.post('/updateteam', this.updateTeam);
     }
 }
