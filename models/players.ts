@@ -9,10 +9,13 @@ let PlayersSchema: Schema = new Schema({
         type: Number,
         required: true
     },
-    team: {
+    position: {
         type: String,
         required: true
+    },
+    team: {
+        type: String
     }
 });
 
-export default model('Playe', PlayersSchema);
+export default model('Player', PlayersSchema);

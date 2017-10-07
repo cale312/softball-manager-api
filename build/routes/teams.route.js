@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const teams_1 = require("../models/teams");
+const players_1 = require("../models/players");
 /* GET Managers listing. */
 class TeamsRouter {
     constructor() {
@@ -30,21 +31,20 @@ class TeamsRouter {
         const manager = req.body.manager;
         const coach = req.body.coach;
         const rank = req.body.rank;
-        const teamPlayers = req.body.teamPlayers;
         if (!teamName || !coach || !rank || !manager) {
-            res.status(422).json({ message: 'All Fields Required.' });
+            res.status(422).json({ message: 'All Fields Required Must Be Filled.' });
         }
+        let team = new teams_1.default({
+            teamName: teamName,
+            manager: manager,
+            coach: coach,
+            rank: rank,
+            teamPlayers: []
+        });
         teams_1.default.findOne({
             teamName: teamName
         }).then((result) => {
             if (!result) {
-                let team = new teams_1.default({
-                    teamName: teamName,
-                    manager: manager,
-                    coach: coach,
-                    rank: rank,
-                    teamPlayers
-                });
                 team.save()
                     .then((team) => {
                     let code = res.statusCode;
@@ -75,17 +75,25 @@ class TeamsRouter {
     updateTeam(req, res, next) {
         const coach = req.body.coach;
         const teamName = req.body.teamName;
-        const teamPlayers = req.body.teamPlayers;
-        if (!teamName) {
+        const playerName = req.body.playerName;
+        const age = req.body.age;
+        const position = req.body.position;
+        if (!teamName || !playerName || !age || !position) {
             res.status(422).json({ message: 'Fill in all required fields' });
         }
         teams_1.default.findOne({
             teamName: teamName
         }).then((result) => {
-            result.update({
-                coach: coach,
-                teamPlayers: teamPlayers || []
-            }).then((result) => {
+            let player = new players_1.default({
+                fullName: playerName,
+                age: age,
+                position: position,
+                team: teamName
+            });
+            player.save();
+            result.teamPlayers.push(player);
+            result.save()
+                .then((result) => {
                 let code = res.statusCode;
                 res.json({
                     code,

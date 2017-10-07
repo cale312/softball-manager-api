@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import Teams from '../models/teams';
+import Team from '../models/teams';
+import Player from '../models/players';
 
 /* GET Managers listing. */
 export class TeamsRouter {
@@ -12,7 +13,7 @@ export class TeamsRouter {
   }
 
   public getAllTeams(req: Request, res: Response, next: NextFunction) {
-    Teams.find()
+    Team.find()
       .then((teams: any) => {
         let code = res.statusCode;
         res.json({
@@ -35,24 +36,23 @@ export class TeamsRouter {
     const manager: string = req.body.manager;
     const coach: string = req.body.coach;
     const rank: number = req.body.rank;
-    const teamPlayers: any = req.body.teamPlayers;
 
     if (!teamName || !coach || !rank || !manager) {
-      res.status(422).json({ message: 'All Fields Required.' });
+      res.status(422).json({ message: 'All Fields Required Must Be Filled.' });
     }
 
-    Teams.findOne({
+    let team = new Team({
+      teamName: teamName,
+      manager: manager,
+      coach: coach,
+      rank: rank,
+      teamPlayers: []
+    });
+
+    Team.findOne({
       teamName: teamName
     }).then( (result: any) => {
       if (!result) {
-        let team = new Teams({
-          teamName: teamName,
-          manager: manager,
-          coach: coach,
-          rank: rank,
-          teamPlayers
-        });
-
         team.save()
           .then((team: any) => {
             let code = res.statusCode;
@@ -85,25 +85,34 @@ export class TeamsRouter {
 
     const coach: string = req.body.coach;
     const teamName: string = req.body.teamName;
-    const teamPlayers: any = req.body.teamPlayers;
 
-    if (!teamName) {
+    const playerName: string = req.body.playerName;
+    const age: number = req.body.age;
+    const position: string = req.body.position;
+
+    if (!teamName || !playerName || !age || !position) {
       res.status(422).json({ message: 'Fill in all required fields'});
     }
-
-    Teams.findOne({
+    
+    Team.findOne({
       teamName: teamName
     }).then( (result: any) => {
-      result.update({
-        coach: coach,
-        teamPlayers: teamPlayers || []
-      }).then( (result: any) => {
-        let code = res.statusCode;
-        res.json({
-          code,
-          result
-        });
+      let player = new Player({
+        fullName: playerName,
+        age: age,
+        position: position,
+        team: teamName
       });
+      player.save();
+      result.teamPlayers.push(player);
+      result.save()
+        .then( (result: any) => {
+          let code = res.statusCode;
+          res.json({
+            code,
+            result
+          });
+        })
     }).catch( (err: any) => {
       const code = res.statusCode;
       res.json({
@@ -122,7 +131,7 @@ export class TeamsRouter {
       res.status(422).json({ message: 'Fill in all required fields' })
     }
 
-    Teams.remove({
+    Team.remove({
       teamName: teamName
     }).then( (result: any) => {
       let code = res.statusCode;

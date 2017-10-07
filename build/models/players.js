@@ -10,9 +10,12 @@ let PlayersSchema = new mongoose_1.Schema({
         type: Number,
         required: true
     },
-    team: {
+    position: {
         type: String,
         required: true
+    },
+    team: {
+        type: String
     }
 });
-exports.default = mongoose_1.model('Playe', PlayersSchema);
+exports.default = mongoose_1.model('Player', PlayersSchema);
